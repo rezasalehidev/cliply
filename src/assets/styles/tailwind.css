@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #0f172a;
+  --color-ink-soft: #334155;
+  --color-muted: #64748b;
+  --color-surface: #f8fafc;
+  --color-panel: #ffffff;
+  --color-line: #e2e8f0;
+  --color-accent: #0f766e;
+  --color-accent-bright: #14b8a6;
+  --color-accent-deep: #0d5c56;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+
+  --shadow-panel: 0 18px 50px rgb(15 23 42 / 0.08);
+  --shadow-soft: 0 8px 24px rgb(15 23 42 / 0.06);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-surface font-sans text-ink antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent-bright/25 text-ink;
+  }
+}
+
+@utility container-page {
+  @apply mx-auto w-full max-w-3xl px-4 sm:px-6;
+}
+
+@utility btn {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-55;
+}
+
+@utility btn-primary {
+  @apply bg-accent text-white shadow-soft hover:not-disabled:bg-accent-deep active:not-disabled:translate-y-px;
+}
+
+@utility btn-ghost {
+  @apply border border-line bg-panel text-ink-soft hover:not-disabled:border-accent/30 hover:not-disabled:text-accent;
+}
+
+@utility field {
+  @apply w-full rounded-xl border border-line bg-panel px-4 py-3.5 text-[15px] text-ink outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/10;
+}

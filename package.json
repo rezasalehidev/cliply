@@ -1,0 +1,40 @@
+{
+  "name": "cliply",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n web,api -c cyan,magenta \"vite\" \"tsx watch server/src/index.ts\"",
+    "dev:web": "vite",
+    "dev:api": "tsx watch server/src/index.ts",
+    "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
+    "build:server": "tsc -p server/tsconfig.json",
+    "preview": "vite preview",
+    "start": "tsx server/src/index.ts"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.28.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "vue": "^3.5.39",
+    "vue-router": "^5.1.0",
+    "youtube-dl-exec": "^3.0.22"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.13.2",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/tsconfig": "^0.9.1",
+    "@vue/typescript-plugin": "^3.3.7",
+    "concurrently": "^9.2.1",
+    "debug": "^4.4.3",
+    "tailwindcss": "^4.3.2",
+    "tsx": "^4.20.5",
+    "typescript": "~5.8.3",
+    "vite": "^8.1.1",
+    "vue-tsc": "^3.3.5"
+  }
+}
