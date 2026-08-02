@@ -1,36 +1,23 @@
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import { isYouTubeUrl, mapInfoError, type VideoInfoResponse } from './_lib/youtube.js'
+import { isYouTubeUrl, mapInfoError } from './_lib/youtube.js'
 
-type Req = IncomingMessage & {
-  method?: string
-  body?: unknown
-}
-
-type Res = ServerResponse & {
-  status: (code: number) => Res
-  json: (body: unknown) => void
-  end: (chunk?: unknown) => void
-}
-
-function readBodyUrl(req: Req): string {
+function readBodyUrl(req) {
   if (typeof req.body === 'string') {
     try {
-      const parsed = JSON.parse(req.body) as { url?: string }
+      const parsed = JSON.parse(req.body)
       return typeof parsed.url === 'string' ? parsed.url.trim() : ''
     } catch {
       return ''
     }
   }
 
-  if (req.body && typeof req.body === 'object' && 'url' in req.body) {
-    const value = (req.body as { url?: unknown }).url
-    return typeof value === 'string' ? value.trim() : ''
+  if (req.body && typeof req.body === 'object' && typeof req.body.url === 'string') {
+    return req.body.url.trim()
   }
 
   return ''
 }
 
-export default async function handler(req: Req, res: Res) {
+export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.status(204).end()
     return
@@ -60,11 +47,7 @@ export default async function handler(req: Req, res: Res) {
       )
     }
 
-    const data = (await response.json()) as {
-      title?: string
-      author_name?: string
-      thumbnail_url?: string
-    }
+    const data = await response.json()
 
     const idMatch =
       url.match(/[?&]v=([^&]+)/)?.[1] ||
@@ -73,16 +56,14 @@ export default async function handler(req: Req, res: Res) {
       url.match(/\/embed\/([^?&/]+)/)?.[1] ||
       ''
 
-    const payload: VideoInfoResponse = {
+    res.status(200).json({
       id: idMatch,
-      title: data.title ?? 'Untitled',
-      thumbnail: data.thumbnail_url ?? '',
+      title: data.title || 'Untitled',
+      thumbnail: data.thumbnail_url || '',
       duration: 0,
-      channel: data.author_name ?? 'Unknown',
+      channel: data.author_name || 'Unknown',
       url,
-    }
-
-    res.status(200).json(payload)
+    })
   } catch (error) {
     console.error('[api/info]', error)
     const detail = error instanceof Error ? error.message : String(error)

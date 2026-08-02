@@ -1,46 +1,13 @@
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import {
-  isYouTubeUrl,
-  sanitizeFilename,
-  type DownloadType,
-} from './_lib/youtube.js'
+import { isYouTubeUrl, sanitizeFilename } from './_lib/youtube.js'
 
 const COBALT_API = process.env.COBALT_API_URL || 'https://api.cobalt.tools/'
 
-type Req = IncomingMessage & {
-  method?: string
-  query: Record<string, string | string[] | undefined>
-}
-
-type Res = ServerResponse & {
-  status: (code: number) => Res
-  json: (body: unknown) => void
-  end: (chunk?: unknown) => void
-  redirect: (code: number, url: string) => void
-  setHeader: (name: string, value: string) => void
-}
-
-interface CobaltSuccess {
-  status: 'tunnel' | 'redirect' | 'picker'
-  url?: string
-  filename?: string
-  picker?: Array<{ type?: string; url?: string }>
-}
-
-interface CobaltError {
-  status: 'error'
-  error?: { code?: string; message?: string }
-}
-
-function queryString(value: string | string[] | undefined): string {
-  if (Array.isArray(value)) return value[0] ?? ''
+function queryString(value) {
+  if (Array.isArray(value)) return value[0] || ''
   return typeof value === 'string' ? value : ''
 }
 
-async function resolveCobaltDownload(
-  url: string,
-  type: DownloadType,
-): Promise<{ downloadUrl: string; filename?: string }> {
+async function resolveCobaltDownload(url, type) {
   const body =
     type === 'mp3'
       ? {
@@ -65,20 +32,20 @@ async function resolveCobaltDownload(
     body: JSON.stringify(body),
   })
 
-  const data = (await response.json()) as CobaltSuccess | CobaltError
+  const data = await response.json()
 
   if (!response.ok || data.status === 'error') {
     const message =
-      (data as CobaltError).error?.message ||
-      (data as CobaltError).error?.code ||
+      data?.error?.message ||
+      data?.error?.code ||
       `Download service failed (${response.status})`
     throw new Error(message)
   }
 
   if (data.status === 'picker') {
     const picked =
-      data.picker?.find((item) => item.type === 'video' && item.url) ||
-      data.picker?.find((item) => item.url)
+      (data.picker || []).find((item) => item.type === 'video' && item.url) ||
+      (data.picker || []).find((item) => item.url)
 
     if (!picked?.url) {
       throw new Error('No downloadable stream was returned for this video.')
@@ -94,7 +61,7 @@ async function resolveCobaltDownload(
   throw new Error('Unexpected response from download service.')
 }
 
-export default async function handler(req: Req, res: Res) {
+export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.status(204).end()
     return
@@ -106,7 +73,7 @@ export default async function handler(req: Req, res: Res) {
   }
 
   const url = queryString(req.query.url).trim()
-  const type = (queryString(req.query.type) || 'mp4') as DownloadType
+  const type = queryString(req.query.type) || 'mp4'
   const titleHint = sanitizeFilename(queryString(req.query.title) || 'cliply-download')
 
   if (!url || !isYouTubeUrl(url)) {

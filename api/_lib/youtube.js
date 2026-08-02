@@ -1,14 +1,3 @@
-export type DownloadType = 'mp3' | 'mp4'
-
-export interface VideoInfoResponse {
-  id: string
-  title: string
-  thumbnail: string
-  duration: number
-  channel: string
-  url: string
-}
-
 const YOUTUBE_HOSTS = new Set([
   'youtube.com',
   'www.youtube.com',
@@ -18,7 +7,7 @@ const YOUTUBE_HOSTS = new Set([
   'music.youtube.com',
 ])
 
-export function isYouTubeUrl(value: string): boolean {
+export function isYouTubeUrl(value) {
   try {
     const parsed = new URL(value)
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false
@@ -39,9 +28,9 @@ export function isYouTubeUrl(value: string): boolean {
   }
 }
 
-export function sanitizeFilename(name: string): string {
+export function sanitizeFilename(name) {
   return (
-    name
+    String(name || '')
       .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '')
       .replace(/\s+/g, ' ')
       .trim()
@@ -49,11 +38,12 @@ export function sanitizeFilename(name: string): string {
   )
 }
 
-export function mapInfoError(detail: string): string {
-  if (detail.includes('Private video')) {
+export function mapInfoError(detail) {
+  const text = String(detail || '')
+  if (text.includes('Private video')) {
     return 'This video is private and cannot be downloaded.'
   }
-  if (detail.includes('Video unavailable') || detail.includes('unavailable')) {
+  if (text.includes('Video unavailable') || text.includes('unavailable')) {
     return 'This video is unavailable.'
   }
   return 'Could not fetch video info. Check the link, your network, and try again.'
