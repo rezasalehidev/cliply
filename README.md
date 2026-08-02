@@ -2,9 +2,13 @@
 
 Paste a YouTube link and download it as **MP4** (video) or **MP3** (audio).
 
+**Live demo:** [https://cliply-neon.vercel.app/](https://cliply-neon.vercel.app/)
+
 Cliply is a small Vue 3 app with a local API. You drop in a URL, preview the video, pick a format, and download the file.
 
 > Use this only for media you own or have permission to download. Respect YouTube’s terms and copyright laws.
+>  
+> The Vercel demo hosts the frontend. Full MP3/MP4 downloads need the local API (`yarn dev`) because yt-dlp runs on the server.
 
 ## Features
 
